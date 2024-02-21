@@ -1,4 +1,4 @@
-# utils for pybox
+from colorama import Fore, Style
 
 def is_chinese(ch: str) -> bool:
     return '\u4e00' <= ch <= '\u9fff'
@@ -82,6 +82,39 @@ def text_wrap(text: str, width: int) -> list[tuple[str, int]]:
                 lines.append(text_line)
     return lines
 
+def text_style(text: str, style: str = '', color: str = ''):
+    '''
+    Add ansi escape sequences to string
+
+    Args:
+        text:
+        style: 'bold' or 'italic'
+        color: ['green', 'yellow', 'blue', 'black', 'cyan', 'magenta', 'red', 'white']
+    '''
+    if style == 'bold':
+        text = '\x1b[1m' + text
+    elif style == 'italic':
+        text = '\x1b[3m' + text
+    
+    if color == 'green':
+        text = Fore.GREEN + text
+    elif color == 'yellow':
+        text = Fore.YELLOW + text
+    elif color == 'blue':
+        text = Fore.BLUE + text
+    elif color == 'black':
+        text = Fore.BLACK + text
+    elif color == 'cyan':
+        text = Fore.CYAN + text
+    elif color == 'magenta':
+        text = Fore.MAGENTA + text
+    elif color == 'red':
+        text = Fore.RED + text
+    elif color == 'white':
+        text = Fore.WHITE + text
+
+    return text + Style.RESET_ALL
+
 if __name__ == '__main__':
     # unit test
     assert is_chinese('中')
@@ -155,3 +188,7 @@ if __name__ == '__main__':
     assert lines[0][1] == 10
     assert lines[1][0] == 'world ! @'
     assert lines[1][1] == 9
+
+    print(text_style('hello', 'bold', 'red'))
+    print(text_style('hello', 'italic', 'blue'))
+    print(text_style('hello', '', 'yellow'))
