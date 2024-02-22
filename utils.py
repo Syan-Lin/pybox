@@ -10,10 +10,21 @@ def is_english(ch) -> bool:
 def is_tab(ch) -> bool:
     return not re.match('[\t\n\r\b\a\f]', ch) == None
 
+def text_width(text: str) -> int:
+    width = 0
+    for ch in text:
+        if is_chinese(ch):
+            width += 2
+        elif is_tab(ch):
+            pass
+        else:
+            width += 1
+    return width
+
 def extract_words(text: str) -> list[tuple[str, int]]:
     '''
     Automatically split words from mixed Chinese and English strings
-    
+
     Args:
         text:  The string to be extracted
 
@@ -27,7 +38,7 @@ def extract_words(text: str) -> list[tuple[str, int]]:
         if is_chinese(ch):
             if eng_word:
                 eng_word = False
-                words.append((text[begin:i], i-begin))
+                words.append((text[begin:i], i - begin))
             words.append((ch, 2))
         elif is_english(ch):
             if not eng_word:
@@ -36,15 +47,15 @@ def extract_words(text: str) -> list[tuple[str, int]]:
         elif is_tab(ch):
             if eng_word:
                 eng_word = False
-                words.append((text[begin:i], i-begin))
+                words.append((text[begin:i], i - begin))
         else:
             if eng_word:
                 eng_word = False
-                words.append((text[begin:i], i-begin))
+                words.append((text[begin:i], i - begin))
             words.append((ch, 1))
 
         if i == len(text) - 1 and eng_word:
-            words.append((text[begin:i+1], i-begin))
+            words.append((text[begin:i+1], i + 1 - begin))
     return words
 
 def lstrip(line: str, width: int) -> tuple[str, int]:
@@ -58,7 +69,7 @@ def lstrip(line: str, width: int) -> tuple[str, int]:
 def text_wrap(text: str, width: int) -> list[tuple[str, int]]:
     '''
     Automatically wrap text so that the width of each line does not exceed `width`
-    
+
     Args:
         text:  The string to be wraped
         width: Max width of a line
@@ -98,7 +109,7 @@ def text_style(text: str, style: str = '', color: str = ''):
         text = '\x1b[1m' + text
     elif style == 'italic':
         text = '\x1b[3m' + text
-    
+
     if color == 'green':
         text = Fore.GREEN + text
     elif color == 'yellow':
@@ -205,12 +216,13 @@ if __name__ == '__main__':
     assert lines[1][0] == 'world ! @'
     assert lines[1][1] == 9
 
-    text = 'hello\n 你好\t world ! @'
+    text = 'hello\n  ! @你好\t world'
     lines = text_wrap(text, 10)
-    assert lines[0][0] == 'hello 你好'
+    print(lines)
+    assert lines[0][0] == 'hello  ! @'
     assert lines[0][1] == 10
-    assert lines[1][0] == 'world ! @'
-    assert lines[1][1] == 9
+    assert lines[1][0] == '你好 world'
+    assert lines[1][1] == 10
 
     print(text_style('hello', 'bold', 'red'))
     print(text_style('hello', 'italic', 'blue'))
