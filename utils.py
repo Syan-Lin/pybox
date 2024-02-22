@@ -218,7 +218,6 @@ if __name__ == '__main__':
 
     text = 'hello\n  ! @你好\t world'
     lines = text_wrap(text, 10)
-    print(lines)
     assert lines[0][0] == 'hello  ! @'
     assert lines[0][1] == 10
     assert lines[1][0] == '你好 world'
