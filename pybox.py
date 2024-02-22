@@ -89,10 +89,13 @@ def pybox(
         print(COL + box_width * SPACE + COL)
 
     # Print the texts in box
+    if print_title:
+        print(COL + __text_line__(title, title_width, box_width, title_align, SPACE, margin) + COL)
     for text in texts:
+        if len(text) == 0:
+            print(COL + SPACE * box_width + COL)
+            continue
         text = text_wrap(text, box_width)
-        if print_title:
-            print(COL + __text_line__(title, title_width, box_width, title_align, SPACE, margin) + COL)
         for text_line in text:
             content = text_style(text_line[0], style, color)
             width = text_line[1]
