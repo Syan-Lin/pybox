@@ -1,10 +1,14 @@
 from colorama import Fore, Style
+import re
 
 def is_chinese(ch: str) -> bool:
     return '\u4e00' <= ch <= '\u9fff'
 
 def is_english(ch) -> bool:
     return (u'\u0041'<= ch <= u'\u005a') or (u'\u0061'<= ch <= u'\u007a')
+
+def is_tab(ch) -> bool:
+    return not re.match('[\t\n\r\b\a\f]', ch) == None
 
 def extract_words(text: str) -> list[tuple[str, int]]:
     '''
@@ -29,11 +33,10 @@ def extract_words(text: str) -> list[tuple[str, int]]:
             if not eng_word:
                 begin = i
             eng_word = True
-        elif ch.isspace():
+        elif is_tab(ch):
             if eng_word:
                 eng_word = False
                 words.append((text[begin:i], i-begin))
-            words.append((ch, 1))
         else:
             if eng_word:
                 eng_word = False
@@ -131,6 +134,19 @@ if __name__ == '__main__':
     assert not is_english('!')
     assert not is_english('!@')
 
+    assert is_tab('\t')
+    assert is_tab('\n')
+    assert is_tab('\r')
+    assert is_tab('\b')
+    assert is_tab('\a')
+    assert is_tab('\f')
+    assert not is_tab('e')
+    assert not is_tab('eng')
+    assert not is_tab('中')
+    assert not is_tab('中文')
+    assert not is_tab('!')
+    assert not is_tab('!@')
+
     text = 'hello你好world!@'
     words = extract_words(text)
     assert words[0] == ('hello', 5)
@@ -183,6 +199,13 @@ if __name__ == '__main__':
     assert lines[1][1] == 7
 
     text = 'hello 你好 world ! @'
+    lines = text_wrap(text, 10)
+    assert lines[0][0] == 'hello 你好'
+    assert lines[0][1] == 10
+    assert lines[1][0] == 'world ! @'
+    assert lines[1][1] == 9
+
+    text = 'hello\n 你好\t world ! @'
     lines = text_wrap(text, 10)
     assert lines[0][0] == 'hello 你好'
     assert lines[0][1] == 10
