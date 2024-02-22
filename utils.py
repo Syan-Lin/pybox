@@ -8,12 +8,22 @@ def is_english(ch) -> bool:
     return (u'\u0041'<= ch <= u'\u005a') or (u'\u0061'<= ch <= u'\u007a')
 
 def is_tab(ch) -> bool:
-    return not re.match('[\t\n\r\b\a\f]', ch) == None
+    return re.match('[\t\n\r\b\a\f]', ch) != None
+
+def is_emoji(ch):
+    return re.match("["
+                    u"\U0001F600-\U0001F64F"  # emoticons
+                    u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+                    u"\U0001F680-\U0001F6FF"  # transport & map symbols
+                    u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                    u"\U00002702-\U000027B0"
+                    u"\U000024C2-\U0001F251"
+                    "]+", ch, flags=re.UNICODE) != None
 
 def text_width(text: str) -> int:
     width = 0
     for ch in text:
-        if is_chinese(ch):
+        if is_chinese(ch) or is_emoji(ch):
             width += 2
         elif is_tab(ch):
             pass
@@ -35,7 +45,7 @@ def extract_words(text: str) -> list[tuple[str, int]]:
     words = []
     eng_word = False
     for i, ch in enumerate(text):
-        if is_chinese(ch):
+        if is_chinese(ch) or is_emoji(ch):
             if eng_word:
                 eng_word = False
                 words.append((text[begin:i], i - begin))
@@ -157,6 +167,15 @@ if __name__ == '__main__':
     assert not is_tab('中文')
     assert not is_tab('!')
     assert not is_tab('!@')
+
+    assert is_emoji('😊')
+    assert is_emoji('✨')
+    assert is_emoji('✋')
+    assert is_emoji('🐲')
+    assert not is_emoji('A')
+    assert not is_emoji('!')
+    assert not is_emoji('!@')
+    assert not is_emoji('ABC')
 
     text = 'hello你好world!@'
     words = extract_words(text)
