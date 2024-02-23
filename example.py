@@ -36,7 +36,7 @@ if __name__ == '__main__':
         style='italic', margin=3, align='left', box_width=16)
 
     # Give it a try!
-    box(['When grace is lost from life, come with a burst of song.', '',
+    box(['🌅 When grace is lost from life, come with a burst of song.', '',
          '当生命失去恩宠，请惠我以欢歌。'], title='Rabindranath Tagore',
-         title_align='downright', margin=3, align='left',
+         title_align='downright', margin=3, align='left', title_color='yellow',
          box_style='double', color='green')
