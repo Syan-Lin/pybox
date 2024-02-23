@@ -1,4 +1,4 @@
-from utils import text_style, text_wrap, text_width
+from pyboxmaker.utils import text_style, text_wrap, text_width
 
 def __text_line__(
         text: str,
@@ -23,7 +23,7 @@ def __text_line__(
 
     return placeholder * margin + text + placeholder * margin
 
-def pybox(
+def box(
         texts: str | list[str],           # The texts in box
         title: str = '',                  # The title of box, any string
         title_style: str = 'normal',      # ['normal', 'bold', 'italic']
@@ -35,7 +35,7 @@ def pybox(
         color: str = '',                  # ['green', 'yellow', 'blue', 'black', 'cyan', 'magenta', 'red', 'white']
         style: str = 'normal',            # ['normal', 'bold', 'italic']
         align: str = 'center',            # ['center', 'left', 'right']
-        margin: int = 3) -> None:         # The margin of the box
+        margin: int = 1) -> None:         # The margin of the box
     # Set box style
     NORMAL = ' ┌┐└┘│─'
     DOUBLE = ' ╔╗╚╝║═'
@@ -65,19 +65,20 @@ def pybox(
     COL         = text_style(STYLE[5], color=box_color)
     ROW         = text_style(STYLE[6], color=box_color)
 
-    # Set title style
-    title_width = text_width(title)
-    print_title = 'inner' in title_align and title
-    title = text_style(title, title_style, title_color)
-
     # Calculate the width of the box
     if isinstance(texts, str):
         texts = [texts]
     if AUTO_WIDTH:
         for text in texts:
             box_width = max(text_width(text), box_width)
+        box_width = max(text_width(title), box_width)
         box_width = min(MAX_BOX_LEN, box_width)
     box_width += 2 * margin
+
+    # Set title style
+    title_width = text_width(title)
+    print_title = 'inner' in title_align and title
+    title = text_style(title, title_style, title_color)
 
     # Draw the top of the box
     if 'up' in title_align:
@@ -95,7 +96,7 @@ def pybox(
         if len(text) == 0:
             print(COL + SPACE * box_width + COL)
             continue
-        text = text_wrap(text, box_width)
+        text = text_wrap(text, box_width - 2 * margin)
         for text_line in text:
             content = text_style(text_line[0], style, color)
             width = text_line[1]
